@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS
     type_velo, -- OK
     fournisseur, -- OK
     commande,
+    adresse,
     etat, -- OK
     utilisateur; -- OK
 
@@ -30,14 +31,30 @@ CREATE TABLE etat(
                      PRIMARY KEY(id_etat)
 );
 
+create table if not exists adresse(
+                        id_adresse int not null auto_increment,
+                        id_utilisateur int not null,
+                        nom varchar(255),
+                        rue varchar(255),
+                        code_postal int,
+                        ville varchar(255),
+                        date_utilisation date,
+                        primary key (id_adresse),
+                        foreign key (id_utilisateur) references utilisateur(id_utilisateur)
+);
+
 CREATE TABLE commande(
                          id_commande INT NOT NULL AUTO_INCREMENT,
                          date_achat DATE,
                          id_utilisateur INT NOT NULL,
                          etat_id INT NOT NULL,
+                         id_adresse_facture int not null ,
+                         id_adresse_livraison int not null ,
                          PRIMARY KEY (id_commande),
                          FOREIGN KEY (id_utilisateur) REFERENCES utilisateur(id_utilisateur),
-                         FOREIGN KEY (etat_id) REFERENCES etat(id_etat)
+                         FOREIGN KEY (etat_id) REFERENCES etat(id_etat),
+                         foreign key (id_adresse_facture) references adresse(id_adresse),
+                         foreign key (id_adresse_livraison) references adresse(id_adresse)
 );
 
 CREATE TABLE fournisseur(
@@ -112,8 +129,21 @@ INSERT INTO ligne_panier VALUES
                              (2, 8, 1),
                              (2, 4, 2);
 
-INSERT INTO commande VALUE  (NULL, '2021-07-04', 1, 2),
-                            (null, '2022-02-22', 2,2);
+insert into adresse(id_adresse, id_utilisateur, nom, rue, code_postal, ville, date_utilisation) values
+                            (
+                                null, 1, 'IUT', '19 Av. du Maréchal Juin', 90016, 'Belfort', '2022-02-22'
+                            ),
+                            (
+                                null, 1, 'Mairie Belfort', 'Pl. d''Armes', 90000, 'Belfort', '2022-02-22'
+                            ),
+                            (
+                                null, 2, 'IUT', '19 Av. du Maréchal Juin', 90016, 'Belfort', '2022-02-22'
+                            );
+
+
+INSERT INTO commande(id_commande, date_achat, id_utilisateur, etat_id, id_adresse_facture, id_adresse_livraison) VALUES
+                            (NULL, '2021-07-04', 1, 2,1,1),
+                            (null, '2022-02-22', 2,2,1,2);
 INSERT INTO ligne_commande VALUES (1, 3, 2, 12599.00),
                                   (1, 7, 1, 7993.25),
                                   (2,3,2,13456),

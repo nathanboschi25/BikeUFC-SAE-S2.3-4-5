@@ -30,7 +30,7 @@ def admin_commande_show():
     articles_commande = None
     commande_adresses = None
     id_commande = request.args.get('id_commande', None)
-    print(id_commande)
+    # print(id_commande)
     if id_commande != None:
         sql = '''
         select v.libelle_velo as nom, v.prix_velo as prix,lc.prix as prix_ligne, lc.quantite as quantite from commande cd
@@ -40,8 +40,16 @@ def admin_commande_show():
         '''
         mycursor.execute(sql, id_commande)
         articles_commande = mycursor.fetchall()
-
-        commande_adresses = [] # TODO : récup les adress de commande comme en haut
+        # print(articles_commande)
+        sql = '''
+            select ad.nom as nom_livraison, ad.rue as rue_livraison, ad.code_postal as code_postal_livraison, ville as ville_livraison from adresse ad
+            inner join commande c on ad.id_adresse = c.id_adresse_livraison
+            where c.id_commande = %s;
+        '''
+        mycursor.execute(sql, id_commande)
+        commande_adresses = mycursor.fetchone()
+        print(commande_adresses)
+        # TODO : récup l'adreesse de facture sur la même commande et le même fetch avec les bon 'as' de la template admin/commande/show
     return render_template('admin/commandes/show.html'
                            , commandes=commandes
                            , articles_commande=articles_commande
