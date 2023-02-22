@@ -1,0 +1,61 @@
+#! /usr/bin/python
+# -*- coding:utf-8 -*-
+import numpy
+from flask import Blueprint
+from flask import Flask, request, render_template, redirect, abort, flash, session
+
+from connexion_db import get_db
+
+client_article = Blueprint('client_article', __name__,
+                        template_folder='templates')
+
+@client_article.route('/client/index')
+@client_article.route('/client/article/show')              # remplace /client
+def client_article_show():                                 # remplace client_index
+    mycursor = get_db().cursor()
+    id_client = session['id_user']
+
+    sql = '''SELECT id_velo AS id_article,
+       libelle_velo AS nom,
+       prix_velo AS prix,
+       stock AS stock,
+       image_velo as `image`
+
+        FROM velo
+        ORDER BY libelle_velo;'''
+    mycursor.execute(sql)
+    velos = mycursor.fetchall()
+    # list_param = []
+    # condition_and = ""
+    # # utilisation du filtre
+    # sql3=''' prise en compte des commentaires et des notes dans le SQL    '''
+    # articles =[]
+
+
+    # pour le filtre
+    sql = "SELECT * FROM type_velo;"
+    mycursor.execute(sql)
+    types_velo = mycursor.fetchall()
+
+    sql = '''SELECT l.*, v.prix_velo as prix, v.libelle_velo as nom ,v.* FROM ligne_panier l LEFT JOIN velo v on v.id_velo = l.id_velo WHERE id_utilisateur=%s'''
+    mycursor.execute(sql, id_client)
+    articles_panier = mycursor.fetchall()
+
+    if len(articles_panier) >= 1:
+        sql = '''   SELECT SUM(quantite*v.prix_velo) AS prix_total
+                    FROM ligne_panier
+                    LEFT JOIN velo v on v.id_velo = ligne_panier.id_velo
+                    WHERE id_utilisateur=%s
+                    GROUP BY id_utilisateur
+                '''
+        mycursor.execute(sql, id_client)
+        prix_total = mycursor.fetchone()
+        prix_total = prix_total['prix_total']
+    else:
+        prix_total = None
+    return render_template('client/boutique/panier_article.html'
+                           , articles=velos
+                           , articles_panier=articles_panier
+                           , prix_total=prix_total
+                           , items_filtre=types_velo
+                           )
