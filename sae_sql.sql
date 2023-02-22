@@ -112,6 +112,9 @@ INSERT INTO ligne_panier VALUES
                              (2, 8, 1),
                              (2, 4, 2);
 
-INSERT INTO commande VALUE (NULL, '2021-07-04', 1, 2);
+INSERT INTO commande VALUE  (NULL, '2021-07-04', 1, 2),
+                            (null, '2022-02-22', 2,2);
 INSERT INTO ligne_commande VALUES (1, 3, 2, 12599.00),
-                                  (1, 7, 1, 7993.25);
+                                  (1, 7, 1, 7993.25),
+                                  (2,3,2,13456),
+                                  (2,4,3,12232);
