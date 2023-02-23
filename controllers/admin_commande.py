@@ -69,8 +69,7 @@ def admin_commande_valider():
         print(commande_id)
         sql = '''   update commande
                     set etat_id = 2
-                    where etat_id =1
-                    and commande.id_commande = %s;'''
+                    where commande.id_commande = %s;'''
         # FIXME : update de l'état fonctionnel en locale mais pas sur pythonanywhere
         mycursor.execute(sql, commande_id)
         get_db().commit()
