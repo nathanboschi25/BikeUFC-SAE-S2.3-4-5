@@ -17,7 +17,12 @@ admin_article = Blueprint('admin_article', __name__,
 @admin_article.route('/admin/article/show')
 def show_article():
     mycursor = get_db().cursor()
-    sql = '''  requête admin_article_1
+    sql = '''  select 
+                    v.libelle_velo as nom, v.id_velo as id_article, v.prix_velo as prix, 
+                    v.id_type as type_article_id, tv.libelle_type as libelle, v.stock as stock, 
+                    v.image_velo as image 
+                from velo v
+                inner join type_velo tv on v.id_type = tv.id_type;
     '''
     mycursor.execute(sql)
     articles = mycursor.fetchall()
