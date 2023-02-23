@@ -1,13 +1,13 @@
 DROP TABLE IF EXISTS
     ligne_panier,
     ligne_commande,
+    type_velo,
     velo,
-    type_velo, -- OK
-    fournisseur, -- OK
+    fournisseur,
     commande,
     adresse,
-    etat, -- OK
-    utilisateur; -- OK
+    etat,
+    utilisateur;
 
 CREATE TABLE utilisateur(
                             id_utilisateur INT NOT NULL AUTO_INCREMENT,
@@ -143,8 +143,12 @@ insert into adresse(id_adresse, id_utilisateur, nom, rue, code_postal, ville, da
 
 INSERT INTO commande(id_commande, date_achat, id_utilisateur, etat_id, id_adresse_facture, id_adresse_livraison) VALUES
                             (NULL, '2021-07-04', 1, 2,1,1),
-                            (null, '2022-02-22', 2,2,1,2);
-INSERT INTO ligne_commande VALUES (1, 3, 2, 12599.00),
+                            (null, '2022-02-22', 2,2,1,2),
+                            (null,'2022-02-22',2,1,2,1),
+                            (null,'2022-02-22',2,1,2,1);
+INSERT INTO ligne_commande(id_commande, id_velo, quantite, prix) VALUES (1, 3, 2, 12599.00),
                                   (1, 7, 1, 7993.25),
                                   (2,3,2,13456),
-                                  (2,4,3,12232);
+                                  (2,4,3,12232),
+                                  (3,2,3,123867),
+                                  (4,1,2,12323);
