@@ -42,7 +42,7 @@
             <td>
                 {% if ligne.nb_declinaisons is defined %} {{ ligne.nb_declinaisons }} {% else %} decli ND {% endif %}
             </td>
-            <td>{{ ligne.image }} {% if ligne.image is not none %}
+            <td>{% if ligne.image is not none %}
                 <img style="width:40px;height:40px" src="{{ url_for('static', filename = 'images/' + ligne['image']) }}" alt="image  de {{ ligne.nom }}"> {% else %}
                 <img style="width:40px;height:40px" src="{{ url_for('static', filename='images/no_photo.jpeg')}}" alt="pas d image"> {% endif %}
             </td>
