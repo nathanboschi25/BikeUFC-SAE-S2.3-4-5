@@ -20,5 +20,6 @@ inner join adresse fa on c.id_adresse_facture = fa.id_adresse
 inner join adresse li on c.id_adresse_livraison = li.id_adresse
 where c.id_commande = %s;
 
-select v.libelle_velo as nom, v.id_velo as id_article, v.prix_velo as prix, v.id_type as type_article_id, tv.libelle_type as libelle, v.stock as stock, v.image_velo as image from velo v
+select v.libelle_velo as nom, v.id_velo as id_article, v.prix_velo as prix, v.id_type as type_article_id,
+       tv.libelle_type as libelle, v.stock as stock, v.image_velo as image from velo v
 inner join type_velo tv on v.id_type = tv.id_type; # avis as nb_commentaires_nouveaux // faire aussi nb_declinaisons
