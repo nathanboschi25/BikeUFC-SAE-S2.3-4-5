@@ -15,6 +15,7 @@ admin_article = Blueprint('admin_article', __name__,
 
 
 @admin_article.route('/admin/article/show')
+# templates\admin\article\show_article.html
 def show_article():
     mycursor = get_db().cursor()
     sql = '''  select 
@@ -30,6 +31,7 @@ def show_article():
 
 
 @admin_article.route('/admin/article/add', methods=['GET'])
+# 
 def add_article():
     mycursor = get_db().cursor()
 
@@ -41,6 +43,7 @@ def add_article():
 
 
 @admin_article.route('/admin/article/add', methods=['POST'])
+# templates\admin\article\add_article.html
 def valid_add_article():
     mycursor = get_db().cursor()
 
@@ -103,35 +106,48 @@ def delete_article():
 
 
 @admin_article.route('/admin/article/edit', methods=['GET'])
+# templates\admin\article\edit_article.html
 def edit_article():
     id_article=request.args.get('id_article')
     mycursor = get_db().cursor()
     sql = '''
-    requête admin_article_6    
+            select 
+                v.id_velo as id_article, v.libelle_velo as nom, 
+                v.id_type as type_article_id, v.prix_velo as prix, 
+                v.image_velo as image, v.stock as stock
+                from velo v
+            where v.id_velo = %s;
     '''
     mycursor.execute(sql, id_article)
     article = mycursor.fetchone()
     print(article)
     sql = '''
-    requête admin_article_7
+            select 
+                ty.libelle_type as libelle, ty.id_type as id_type_article
+            from type_velo ty;
     '''
     mycursor.execute(sql)
     types_article = mycursor.fetchall()
 
-    # sql = '''
-    # requête admin_article_6
-    # '''
-    # mycursor.execute(sql, id_article)
-    # declinaisons_article = mycursor.fetchall()
+    sql = '''
+            select tv.libelle_type as libelle_type, v.stock
+            from velo v
+            inner join type_velo tv on v.id_type = tv.id_type
+            where v.id_velo = %s
+            group by tv.id_type;
+    '''
+    mycursor.execute(sql, id_article)
+    declinaisons_article = mycursor.fetchall()
 
     return render_template('admin/article/edit_article.html'
                            ,article=article
                            ,types_article=types_article
-                         #  ,declinaisons_article=declinaisons_article
+                          ,declinaisons_article=declinaisons_article
                            )
 
 
 @admin_article.route('/admin/article/edit', methods=['POST'])
+# templates\admin\article\add_article.html
 def valid_edit_article():
     mycursor = get_db().cursor()
     nom = request.form.get('nom')
@@ -141,8 +157,11 @@ def valid_edit_article():
     prix = request.form.get('prix', '')
     image = request.files.get('image')
     description = request.form.get('description')
+    stock = request.form.get('stock')
     sql = '''
-       requête admin_article_8
+       select v.image_velo as image
+        from velo v
+        where v.id_velo = %s;
        '''
     mycursor.execute(sql, id_article)
     image_nom = mycursor.fetchone()
@@ -157,8 +176,12 @@ def valid_edit_article():
             image.save(os.path.join('static/images/', filename))
             image_nom = filename
 
-    sql = '''  requête admin_article_9 '''
-    mycursor.execute(sql, (nom, image_nom, prix, type_article_id, description, id_article))
+    sql = '''  
+            update velo
+            set libelle_velo = %s, image_velo = %s, prix_velo = %s, id_type = %s, description_velo = %s, stock = %s
+            where id_velo = %s;
+        '''
+    mycursor.execute(sql, (nom, image_nom, prix, type_article_id, description, stock, id_article))
 
     get_db().commit()
     if image_nom is None:

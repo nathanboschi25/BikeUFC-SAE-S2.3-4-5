@@ -23,3 +23,25 @@ where c.id_commande = %s;
 select v.libelle_velo as nom, v.id_velo as id_article, v.prix_velo as prix, v.id_type as type_article_id,
        tv.libelle_type as libelle, v.stock as stock, v.image_velo as image from velo v
 inner join type_velo tv on v.id_type = tv.id_type; # avis as nb_commentaires_nouveaux // faire aussi nb_declinaisons
+
+select v.id_velo as id_article, v.libelle_velo as nom, v.id_type as type_article_id, v.prix_velo as prix, v.image_velo as image
+from velo v
+where v.id_velo = %s;
+
+select ty.libelle_type as libelle, ty.id_type as id_type_article
+from type_velo ty;
+
+select tv.libelle_type as libelle_type, v.stock
+from velo v
+inner join type_velo tv on v.id_type = tv.id_type
+where v.id_velo = %s
+group by tv.id_type;
+
+select v.image_velo as image
+from velo v
+where v.id_velo = %s;
+
+
+update velo
+set libelle_velo = %s, image_velo = %s, prix_velo = %s, id_type = %s, description_velo = ',', stock = %s
+where id_velo = %s;

@@ -75,6 +75,7 @@ CREATE TABLE velo(
                      prix_velo DECIMAL(10,2),
                      image_velo VARCHAR(255),
                      stock INT,
+                     description_velo varchar(255),
                      id_type INT NOT NULL,
                      id_fournisseur INT NOT NULL,
                      PRIMARY KEY(id_velo),
