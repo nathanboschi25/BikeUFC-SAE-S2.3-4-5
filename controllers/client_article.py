@@ -7,7 +7,7 @@ from flask import Flask, request, render_template, redirect, abort, flash, sessi
 from connexion_db import get_db
 
 client_article = Blueprint('client_article', __name__,
-                        template_folder='templates')
+                           template_folder='templates')
 
 @client_article.route('/client/index')
 @client_article.route('/client/article/show')              # remplace /client
@@ -37,7 +37,14 @@ def client_article_show():                                 # remplace client_ind
     mycursor.execute(sql)
     types_velo = mycursor.fetchall()
 
-    sql = '''SELECT l.*, v.prix_velo as prix, v.libelle_velo as nom ,v.* FROM ligne_panier l LEFT JOIN velo v on v.id_velo = l.id_velo WHERE id_utilisateur=%s'''
+    sql = '''SELECT
+                l.quantite,
+                 v.prix_velo as prix,
+                 v.libelle_velo as nom ,
+                  v.id_velo as id_article
+            FROM ligne_panier l 
+            LEFT JOIN velo v on v.id_velo = l.id_velo 
+            WHERE id_utilisateur=%s'''
     mycursor.execute(sql, id_client)
     articles_panier = mycursor.fetchall()
 
