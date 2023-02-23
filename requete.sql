@@ -11,5 +11,14 @@ where cd.id_commande = %s;
 select ad.nom as nom_livraison, ad.rue as rue_livraison, ad.code_postal as code_postal_livraison, ville as ville_livraison from adresse ad
 inner join commande c on ad.id_adresse = c.id_adresse_livraison
 where c.id_commande = 1;
+select ad.nom as nom_facturation, ad.rue as rue_facturation, ad.code_postal as code_postal_facturation, ville as ville_facturation from adresse ad
+inner join commande c on ad.id_adresse = c.id_adresse_facture
+where c.id_commande = 1;
+
+select li.nom as nom_livraison, li.rue as rue_livraison, li.code_postal as code_postal_livraison, li.ville as ville_livraison from commande c
+inner join adresse fa on c.id_adresse_facture = fa.id_adresse
+inner join adresse li on c.id_adresse_livraison = li.id_adresse
+where c.id_commande = %s;
+
 select * from commande;
  
