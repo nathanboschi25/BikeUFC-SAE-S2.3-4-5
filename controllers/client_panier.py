@@ -42,12 +42,11 @@ def client_panier_add():
     ligne_pannier = mycursor.fetchone()
     article_dans_pannier = True if ligne_pannier is not None else False
     if article_dans_pannier is True:
-        sql = 'UPDATE ligne_panier SET quantite=%s WHERE id_utilisateur=%s AND id_velo=%s'
-        result = mycursor.execute(sql, (ligne_pannier['quantite'] + quantite, id_client, id_article))
+        sql = 'UPDATE ligne_panier SET quantite=quantite+%s WHERE id_utilisateur=%s AND id_velo=%s'
     else:
         sql = 'INSERT INTO ligne_panier(quantite, id_utilisateur, id_velo) VALUE (%s, %s, %s)'
-        result = mycursor.execute(sql, (quantite, id_client, id_article))
 
+    result = mycursor.execute(sql, (quantite, id_client, id_article))
     sql = '''SELECT stock FROM velo WHERE id_velo=%s;'''
     mycursor.execute(sql, id_article)
     stock_final = mycursor.fetchone()['stock'] - quantite
@@ -63,39 +62,26 @@ def client_panier_add():
 def client_panier_delete():
     mycursor = get_db().cursor()
     id_client = session['id_user']
-    id_article = request.form.get('id_article','')
-    quantite = 1
+    id_article = request.form.get('id_article')
 
     # ---------
     # partie 2 : on supprime une déclinaison de l'article
     # id_declinaison_article = request.form.get('id_declinaison_article', None)
 
-    # supression dans le panier d'un article
-    sql = '''SELECT stock FROM velo WHERE id_velo=%s;'''
-    mycursor.execute(sql, id_article)
-    stock_actuel = mycursor.fetchone()['stock']
-    sql = 'SELECT * FROM ligne_panier WHERE id_utilisateur=%s AND id_velo=%s'
+    sql = '''SELECT quantite FROM ligne_panier WHERE id_utilisateur=%s AND id_velo=%s;'''
     mycursor.execute(sql, (id_client, id_article))
-    ligne_pannier = mycursor.fetchone()
-    article_dans_pannier = True if ligne_pannier is not None else False
-    if article_dans_pannier is True:
-        sql = 'UPDATE ligne_panier SET quantite=quantite-%s WHERE id_utilisateur=%s AND id_velo=%s'
-        result = mycursor.execute(sql, (quantite, id_client, id_article))
+
+    if mycursor.fetchone()['quantite'] < 2:
+        sql = '''DELETE FROM ligne_panier WHERE id_utilisateur=%s AND id_velo=%s'''
     else:
-        sql = 'INSERT INTO ligne_panier(quantite, id_utilisateur, id_velo) VALUE (%s, %s, %s)'
-        result = mycursor.execute(sql, (quantite, id_client, id_article))
+        sql = '''UPDATE ligne_panier SET quantite=quantite-1 WHERE id_utilisateur=%s AND id_velo=%s'''
+    mycursor.execute(sql, (id_client, id_article))
 
-    stock_final = stock_actuel + quantite
-
-    if result == 1:
-        sql = 'UPDATE velo SET stock=%s WHERE id_velo=%s'
-        mycursor.execute(sql, (stock_final, id_article))
+    sql = '''UPDATE velo SET stock=stock+1 WHERE id_velo=%s'''
+    mycursor.execute(sql, id_article)
 
     get_db().commit()
     return redirect('/client/article/show')
-
-
-
 
 
 @client_panier.route('/client/panier/vider', methods=['POST'])
