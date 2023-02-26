@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 from flask import Blueprint
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, session, g
-from datetime import datetime, date
+from datetime import datetime
 from connexion_db import get_db
 
 client_commande = Blueprint('client_commande', __name__,
@@ -13,24 +13,17 @@ client_commande = Blueprint('client_commande', __name__,
 def client_commande_valide():
     mycursor = get_db().cursor()
     id_client = session['id_user']
-    sql = '''   SELECT l.*, v.prix_velo AS prix, v.libelle_velo AS nom, v.stock, v.id_velo AS id_article
-                FROM ligne_panier l
-                INNER JOIN velo v on l.id_velo = v.id_velo
-                WHERE id_utilisateur=%s '''
-    mycursor.execute(sql, id_client)
-    articles_panier = mycursor.fetchall()
+    sql = ''' selection des articles d'un panier 
+    '''
+    articles_panier = []
     if len(articles_panier) >= 1:
-        sql = ''' SELECT SUM(quantite*v.prix_velo) as PRIX_TOTAL FROM ligne_panier LEFT JOIN velo v on v.id_velo = ligne_panier.id_velo WHERE id_utilisateur=%s GROUP BY id_utilisateur'''
-        mycursor.execute(sql, id_client)
-        prix_total = mycursor.fetchone()['PRIX_TOTAL']
+        sql = ''' calcul du prix total du panier '''
+        prix_total = None
     else:
         prix_total = None
     # etape 2 : selection des adresses
-    sql = '''SELECT * FROM adresse WHERE id_utilisateur=%s'''
-    mycursor.execute(sql, id_client)
-    adresses = mycursor.fetchall()
     return render_template('client/boutique/panier_validation_adresses.html'
-                           , adresses=adresses
+                           #, adresses=adresses
                            , articles_panier=articles_panier
                            , prix_total= prix_total
                            , validation=1
@@ -43,36 +36,21 @@ def client_commande_add():
     # choix de(s) (l')adresse(s)
 
     id_client = session['id_user']
-    sql = ''' SELECT l.*, v.prix_velo AS prix, v.libelle_velo AS nom, v.stock, v.id_velo
-                FROM ligne_panier l
-                INNER JOIN velo v on l.id_velo = v.id_velo
-                WHERE id_utilisateur=%s '''
-    mycursor.execute(sql, id_client)
-    items_ligne_panier = mycursor.fetchall()
-    if items_ligne_panier is None or len(items_ligne_panier) < 1:
-         flash(u'Pas d\'articles dans le ligne_panier', 'alert-warning')
-         return redirect(url_for('client_index'))
+    sql = ''' selection du contenu du panier de l'utilisateur '''
+    items_ligne_panier = []
+    # if items_ligne_panier is None or len(items_ligne_panier) < 1:
+    #     flash(u'Pas d\'articles dans le ligne_panier', 'alert-warning')
+    #     return redirect(url_for('client_index'))
                                            # https://pynative.com/python-mysql-transaction-management-using-commit-rollback/
-    a = date.today()
+    #a = datetime.strptime('my date', "%b %d %Y %H:%M")
 
-    sql = ''' INSERT INTO commande(date_achat, id_utilisateur, etat_id, id_adresse_facture, id_adresse_livraison) VALUE (%s, %s, %s, %s, %s)'''
-
-    livraison = request.form.get('id_adresse_livraison')
-    if request.form.get('adresse_identique'):
-        facturation = livraison
-    else:
-        facturation = request.form.get('id_adresse_facturation')
-
-    mycursor.execute(sql, (a ,id_client, 1, facturation, livraison))
+    sql = ''' creation de la commande '''
 
     sql = '''SELECT last_insert_id() as last_insert_id'''
-    mycursor.execute(sql)
-    idCommande = int(mycursor.fetchone()['last_insert_id'])
+    # numéro de la dernière commande
     for item in items_ligne_panier:
-        sql = ''' DELETE FROM ligne_panier WHERE id_utilisateur=%s AND id_velo=%s '''
-        mycursor.execute(sql, (id_client, item['id_velo']))
-        sql = '''INSERT INTO ligne_commande(id_commande, id_velo, quantite, prix) VALUE (%s, %s, %s, %s)'''
-        mycursor.execute(sql, (idCommande, item['id_velo'], int(item['quantite']), (int(item['quantite'])*int(item['prix']))))
+        sql = ''' suppression d'une ligne de panier '''
+        sql = "  ajout d'une ligne de commande'"
 
     get_db().commit()
     flash(u'Commande ajoutée','alert-success')
