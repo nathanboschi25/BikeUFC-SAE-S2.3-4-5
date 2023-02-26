@@ -127,6 +127,29 @@ def client_panier_filtre():
     filter_prix_min = request.form.get('filter_prix_min', None)
     filter_prix_max = request.form.get('filter_prix_max', None)
     filter_types = request.form.getlist('filter_types', None)
+    print("word:" + filter_word + str(len(filter_word)))
+    if filter_word or filter_word == "":
+        if len(filter_word) > 1:
+            if filter_word.isalpha():
+                session['filter_word'] = filter_word
+            else:
+                flash(u'votre Mot recherché doit uniquement être composé de lettres')
+        else:
+            if len(filter_word) == 1:
+                flash(u'votre Mot recherché doit être composé de au moins 2 lettres')
+            else:
+                session.pop('filter_word', None)
+    if filter_prix_min or filter_prix_max:
+        if filter_prix_min.isdecimal() and filter_prix_max.isdecimal():
+            if int(filter_prix_min) < int(filter_prix_max):
+                session['filter_prix_min'] = filter_prix_min
+                session['filter_prix_max'] = filter_prix_max
+            else:
+                flash(u'min < max')
+        else:
+            flash(u'min et max doivent être des numériques')
+    if filter_types and filter_types != []:
+        session['filter_types'] = filter_types
     # test des variables puis
     # mise en session des variables
     return redirect('/client/article/show')
@@ -135,5 +158,11 @@ def client_panier_filtre():
 @client_panier.route('/client/panier/filtre/suppr', methods=['POST'])
 def client_panier_filtre_suppr():
     # suppression  des variables en session
+    session.pop('filter_word', None)
+    session.pop('filter_prix_min', None)
+    session.pop('filter_prix_max', None)
+    session.pop('filter_types', None)
     print("suppr filtre")
     return redirect('/client/article/show')
+
+  
