@@ -41,7 +41,8 @@ def client_article_show():                                 # remplace client_ind
                 l.quantite,
                  v.prix_velo as prix,
                  v.libelle_velo as nom ,
-                  v.id_velo as id_article
+                  v.id_velo as id_article,
+                  v.stock
             FROM ligne_panier l 
             LEFT JOIN velo v on v.id_velo = l.id_velo 
             WHERE id_utilisateur=%s'''
