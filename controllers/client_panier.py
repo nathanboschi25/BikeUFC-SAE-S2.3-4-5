@@ -134,13 +134,18 @@ def client_panier_filtre():
                 session['filter_word'] = filter_word
             else:
                 flash(u'votre Mot recherché doit uniquement être composé de lettres')
+                # FIXME : On doit pouvoir cherché avec des chiffer
         else:
             if len(filter_word) == 1:
                 flash(u'votre Mot recherché doit être composé de au moins 2 lettres')
             else:
                 session.pop('filter_word', None)
     if filter_prix_min or filter_prix_max:
-        if filter_prix_min.isdecimal() and filter_prix_max.isdecimal():
+        if filter_prix_min.isdecimal() and not filter_prix_max.isdecimal():
+            session['filter_prix_min'] = filter_prix_min
+        elif not filter_prix_min.isdecimal() and filter_prix_max.isdecimal():
+            session['filter_prix_max'] = filter_prix_max
+        elif filter_prix_min.isdecimal() and filter_prix_max.isdecimal():
             if int(filter_prix_min) < int(filter_prix_max):
                 session['filter_prix_min'] = filter_prix_min
                 session['filter_prix_max'] = filter_prix_max
@@ -148,6 +153,8 @@ def client_panier_filtre():
                 flash(u'min < max')
         else:
             flash(u'min et max doivent être des numériques')
+    # FIXME : les min et max ne peux pas être retirer une fois set 
+    print(filter_prix_min,filter_prix_max)
     if filter_types and filter_types != []:
         session['filter_types'] = filter_types
     # test des variables puis

@@ -21,28 +21,37 @@ def client_article_show():                                 # remplace client_ind
        stock AS stock,
        image_velo as `image`
 
-        FROM velo
-        ORDER BY libelle_velo;'''
+        FROM velo'''
+        # ORDER BY libelle_velo;'''
     list_param = []
     condition_and = ""
-    
+    print(session)
     if "filter_word" in session or "filter_prix_min" in session or "filter_prix_max" in session or "filter_types" in session:
-        sql += sql + " WHERE "
+        sql = sql + " WHERE "
     if "filter_word" in session:
         sql = sql + " libelle_velo LIKE %s "
         recherche = "%" + session["filter_word"] + "%"
         list_param.append(recherche)
         condition_and = " AND "
-    if "filter_prix_min" in session or "filter_prix_max" in session:
+    if "filter_prix_min" in session and "filter_prix_max" not in session :
+        sql = sql + condition_and + " prix_velo > %s "
+        list_param.append(session["filter_prix_min"])
+        condition_and = " AND "
+    elif "filter_prix_max" in session and "filter_prix_min" not in session :
+        sql = sql + condition_and + " prix_velo < %s "
+        list_param.append(session["filter_prix_max"])
+        condition_and = " AND "
+    elif "filter_prix_min" in session and "filter_prix_max" in session:
         sql = sql + condition_and + " prix_velo BETWEEN %s AND %s "
         list_param.append(session["filter_prix_min"])
         list_param.append(session["filter_prix_max"])
         condition_and = " AND "
     if "filter_types" in session:
         sql = sql + condition_and + "("
-        last_item = session['filter_types'][-1]
+        last_item = session['filter_types'][-1] # FIXME : INUTILE ?!
         for item in session['filter_types']:
-            sql = sql + " type_article_id = %s "
+            sql = sql + " id_type = %s "
+            # FIXME
             if item != last_item:
                 sql = sql + " or "
             list_param.append(item)
@@ -52,8 +61,8 @@ def client_article_show():                                 # remplace client_ind
     sql += " ORDER BY libelle_velo; "
 
     
-    
-    mycursor.execute(sql)
+    # print(sql, tuple_sql)
+    mycursor.execute(sql,tuple_sql)
     velos = mycursor.fetchall()
     # list_param = []
     # condition_and = ""

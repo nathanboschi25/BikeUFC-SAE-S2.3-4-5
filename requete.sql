@@ -45,3 +45,15 @@ where v.id_velo = %s;
 update velo
 set libelle_velo = %s, image_velo = %s, prix_velo = %s, id_type = %s, description_velo = ',', stock = %s
 where id_velo = %s;
+
+
+SELECT id_velo AS id_article,
+       libelle_velo AS nom,
+       prix_velo AS prix,
+       stock AS stock,
+       image_velo as `image`
+
+        FROM velo
+
+        WHERE (id_type = 1 or id_type = 2)
+        ORDER BY libelle_velo;

@@ -95,6 +95,8 @@ def client_commande_show():
                 '''
     mycursor.execute(sql, id_client)
     commandes = mycursor.fetchall()
+    articles_commande = None
+    commande_adresses = None    
 
 
     id_commande = request.args.get('id_commande', None)
