@@ -29,7 +29,7 @@ def client_article_show():                                 # remplace client_ind
     if "filter_word" in session or "filter_prix_min" in session or "filter_prix_max" in session or "filter_types" in session:
         sql = sql + " WHERE "
     if "filter_word" in session:
-        sql += sql + " libelle_velo LIKE %s "
+        sql = sql + " libelle_velo LIKE %s "
         recherche = "%" + session["filter_word"] + "%"
         list_param.append(recherche)
         condition_and = " AND "
@@ -55,7 +55,7 @@ def client_article_show():                                 # remplace client_ind
             if item != last_item:
                 sql = sql + " or "
             list_param.append(item)
-        sql += sql + ")"
+        sql = sql + ")"
     tuple_sql = tuple(list_param)
 
     sql += " ORDER BY libelle_velo; "
