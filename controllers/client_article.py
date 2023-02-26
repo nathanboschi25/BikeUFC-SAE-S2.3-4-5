@@ -25,28 +25,35 @@ def client_article_show():                                 # remplace client_ind
         ORDER BY libelle_velo;'''
     list_param = []
     condition_and = ""
-    
+
     if "filter_word" in session or "filter_prix_min" in session or "filter_prix_max" in session or "filter_types" in session:
         sql += sql + " WHERE "
     if "filter_word" in session:
-        sql = sql + " libelle_velo LIKE %s "
+        sql += sql + " libelle_velo LIKE %s "
         recherche = "%" + session["filter_word"] + "%"
         list_param.append(recherche)
         condition_and = " AND "
     if "filter_prix_min" in session or "filter_prix_max" in session:
-        sql = sql + condition_and + " prix_velo BETWEEN %s AND %s "
-        list_param.append(session["filter_prix_min"])
-        list_param.append(session["filter_prix_max"])
+        if "filter_prix_min" in session and "filter_prix_max" not in session:
+            sql += condition_and + " prix_velo >= %s "
+            list_param.append('filter_prix_min')
+        elif "filter_prix_min" not in session and "filtre_prix_max" in session:
+            sql += condition_and + " prix_velo <= %s "
+            list_param.append('filter_prix_max')
+        else:
+            sql += sql + condition_and + " prix_velo BETWEEN %s AND %s "
+            list_param.append(session['filter_prix_min'])
+            list_param.append(session['filter_prix_max'])
         condition_and = " AND "
     if "filter_types" in session:
-        sql = sql + condition_and + "("
+        sql += sql + condition_and + "("
         last_item = session['filter_types'][-1]
         for item in session['filter_types']:
-            sql = sql + " type_article_id = %s "
+            sql += sql + " type_velo_id = %s "
             if item != last_item:
                 sql = sql + " or "
             list_param.append(item)
-        sql = sql + ")"
+        sql += sql + ")"
     tuple_sql = tuple(list_param)
 
     sql += " ORDER BY libelle_velo; "
