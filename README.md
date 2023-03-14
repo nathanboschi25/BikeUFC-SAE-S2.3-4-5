@@ -6,4 +6,4 @@ Groupe numéro 25
 * étudiant 3 : Robin HALM
 * étudiant 4 : Mehmet-Emin IKITAS
 
-URL du site pythonanywhere : http://meikitas.pythonanywhere.com/
+URL du site pythonanywhere : http://rhalm.pythonanywhere.com/
