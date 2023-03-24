@@ -9,9 +9,10 @@ from connexion_db import get_db
 client_article = Blueprint('client_article', __name__,
                            template_folder='templates')
 
+
 @client_article.route('/client/index')
-@client_article.route('/client/article/show')              # remplace /client
-def client_article_show():                                 # remplace client_index
+@client_article.route('/client/article/show')  # remplace /client
+def client_article_show():  # remplace client_index
     mycursor = get_db().cursor()
     id_client = session['id_user']
 
@@ -22,7 +23,7 @@ def client_article_show():                                 # remplace client_ind
        image_velo as `image`
 
         FROM velo'''
-        # ORDER BY libelle_velo;'''
+    # ORDER BY libelle_velo;'''
     list_param = []
     condition_and = ""
 
@@ -33,11 +34,11 @@ def client_article_show():                                 # remplace client_ind
         recherche = "%" + session["filter_word"] + "%"
         list_param.append(recherche)
         condition_and = " AND "
-    if "filter_prix_min" in session and "filter_prix_max" not in session :
+    if "filter_prix_min" in session and "filter_prix_max" not in session:
         sql = sql + condition_and + " prix_velo > %s "
         list_param.append(session["filter_prix_min"])
         condition_and = " AND "
-    elif "filter_prix_max" in session and "filter_prix_min" not in session :
+    elif "filter_prix_max" in session and "filter_prix_min" not in session:
         sql = sql + condition_and + " prix_velo < %s "
         list_param.append(session["filter_prix_max"])
         condition_and = " AND "
@@ -48,7 +49,7 @@ def client_article_show():                                 # remplace client_ind
         condition_and = " AND "
     if "filter_types" in session:
         sql = sql + condition_and + "("
-        last_item = session['filter_types'][-1] # FIXME : INUTILE ?!
+        last_item = session['filter_types'][-1]  # FIXME : INUTILE ?!
         for item in session['filter_types']:
             sql = sql + " id_type = %s "
             # FIXME
@@ -60,16 +61,14 @@ def client_article_show():                                 # remplace client_ind
 
     sql += " ORDER BY libelle_velo; "
 
-    
     # print(sql, tuple_sql)
-    mycursor.execute(sql,tuple_sql)
+    mycursor.execute(sql, tuple_sql)
     velos = mycursor.fetchall()
     # list_param = []
     # condition_and = ""
     # # utilisation du filtre
     # sql3=''' prise en compte des commentaires et des notes dans le SQL    '''
     # articles =[]
-
 
     # pour le filtre
     sql = "SELECT * FROM type_velo;"
@@ -100,9 +99,22 @@ def client_article_show():                                 # remplace client_ind
         prix_total = prix_total['prix_total']
     else:
         prix_total = None
+
+    sql = '''SELECT
+                    h.id_velo as id_article,
+                    v.libelle_velo as nom,
+                    v.prix_velo as prix,
+                    v.image_velo as image
+                 FROM historique h
+                 LEFT JOIN velo v on h.id_velo = v.id_velo
+                 WHERE id_utilisateur=%s;'''
+    mycursor.execute(sql, id_client)
+    articles_historique = mycursor.fetchall()
+
     return render_template('client/boutique/panier_article.html'
                            , articles=velos
                            , articles_panier=articles_panier
                            , prix_total=prix_total
                            , items_filtre=types_velo
+                           , articles_historique=articles_historique
                            )

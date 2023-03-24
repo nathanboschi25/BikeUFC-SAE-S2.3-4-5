@@ -4,6 +4,7 @@ drop table if exists
     ligne_commande,
     commande,
     declinaison_velo,
+    historique,
     adresse,
     utilisateur,
     etat,
@@ -13,20 +14,20 @@ drop table if exists
     type_velo,
     couleur;
 
-CREATE TABLE couleur(
+CREATE TABLE IF NOT EXISTS couleur(
    id_couleur int not null auto_increment,
    libelle VARCHAR(255),
    code VARCHAR(255),
    PRIMARY KEY(id_couleur)
 );
 
-CREATE TABLE type_velo(
+CREATE TABLE IF NOT EXISTS type_velo(
    id_type_velo int not null auto_increment,
    libelle VARCHAR(255),
    PRIMARY KEY(id_type_velo)
 );
 
-CREATE TABLE fournisseur(
+CREATE TABLE IF NOT EXISTS fournisseur(
    id_fournisseur int not null auto_increment,
    libelle VARCHAR(255),
    code_postal INT,
@@ -36,7 +37,7 @@ CREATE TABLE fournisseur(
 );
 
 
-CREATE TABLE velo
+CREATE TABLE IF NOT EXISTS  velo
 (
     id_velo        int NOT NULL AUTO_INCREMENT,
     libelle        VARCHAR(255),
@@ -52,19 +53,19 @@ CREATE TABLE velo
     FOREIGN KEY (id_type_velo) REFERENCES type_velo (id_type_velo) # ON DELETE SET NULL
 );
 
-CREATE TABLE taille(
+CREATE TABLE IF NOT EXISTS taille(
    id_taille int not null auto_increment,
    libelle VARCHAR(255),
    PRIMARY KEY(id_taille)
 );
 
-CREATE TABLE etat(
+CREATE TABLE IF NOT EXISTS etat(
    id_etat int not null auto_increment,
    libelle VARCHAR(255),
    PRIMARY KEY(id_etat)
 );
 
-CREATE TABLE utilisateur(
+CREATE TABLE IF NOT EXISTS utilisateur(
    id_utilisateur int not null auto_increment,
    login VARCHAR(255),
    email VARCHAR(255),
@@ -74,7 +75,7 @@ CREATE TABLE utilisateur(
    PRIMARY KEY(id_utilisateur)
 );
 
-CREATE TABLE adresse(
+CREATE TABLE IF NOT EXISTS adresse(
    id_adresse int not null auto_increment,
    libelle VARCHAR(255),
    rue VARCHAR(255),
@@ -86,7 +87,16 @@ CREATE TABLE adresse(
    FOREIGN KEY(id_utilisateur) REFERENCES utilisateur(id_utilisateur)
 );
 
-CREATE TABLE declinaison_velo(
+CREATE TABLE IF NOT EXISTS historique(
+    id_utilisateur INT NOT NULL,
+    id_velo INT NOT NULL,
+    datetime_visite DATETIME NOT NULL,
+    PRIMARY KEY (id_utilisateur, id_velo, datetime_visite),
+    FOREIGN KEY (id_utilisateur) REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY (id_velo) REFERENCES velo(id_velo)
+);
+
+CREATE TABLE IF NOT EXISTS declinaison_velo(
    id_declinaison_velo int not null auto_increment,
    stock INT,
    prix_declinaison DECIMAL(8,2),
@@ -100,7 +110,7 @@ CREATE TABLE declinaison_velo(
    FOREIGN KEY(id_couleur) REFERENCES couleur(id_couleur)
 );
 
-CREATE TABLE commande(
+CREATE TABLE IF NOT EXISTS commande(
    id_commande int not null auto_increment,
    date_achat DATE,
    id_adresse_facturation INT NOT NULL,
@@ -114,7 +124,7 @@ CREATE TABLE commande(
    FOREIGN KEY(id_etat) REFERENCES etat(id_etat)
 );
 
-CREATE TABLE ligne_commande(
+CREATE TABLE IF NOT EXISTS ligne_commande(
    id_declinaison_velo INT,
    id_commande INT,
    quantite INT,
@@ -124,7 +134,7 @@ CREATE TABLE ligne_commande(
    FOREIGN KEY(id_commande) REFERENCES commande(id_commande)
 );
 
-CREATE TABLE ligne_panier(
+CREATE TABLE IF NOT EXISTS ligne_panier(
    id_declinaison_velo INT,
    id_utilisateur INT,
    quantite INT,
@@ -199,3 +209,5 @@ ORDER BY RAND();
 # values (2,1,2,'2022-02-23'),
 #        (3,2,1,'2022-02-23');
 
+
+SELECT * FROM historique;

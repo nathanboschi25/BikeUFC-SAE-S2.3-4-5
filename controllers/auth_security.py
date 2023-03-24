@@ -83,9 +83,7 @@ def auth_signup_post():
 
 @auth_security.route('/logout')
 def auth_logout():
-    session.pop('login', None)
-    session.pop('role', None)
-    session.pop('id_user', None)
+    session.clear()
     return redirect('/')
 
 @auth_security.route('/forget-password', methods=['GET'])

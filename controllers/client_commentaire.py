@@ -21,6 +21,7 @@ def client_article_details():
     client_historique_add(id_article, id_client)
 
     sql = '''
+        SELECT * FROM velo WHERE id_velo=%s
     '''
     mycursor.execute(sql, id_article)
     article = mycursor.fetchone()
