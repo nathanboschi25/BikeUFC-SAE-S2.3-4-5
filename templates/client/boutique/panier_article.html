@@ -5,69 +5,82 @@
 
 {% extends "client/layout_client.html" %}
 {% block body %}
-<div class="container">
-    <div class="row align-self-right">
-    {% include('client/boutique/_panier.html') %}
-        <div class="col">
-          <h3>Les filtres</h3>
-          Articles dont le nom est composé par :<br>
-             {% include('client/boutique/_filtre.html') %}
+    <div class="container">
+        <h3 class="h5">Derniers articles consultés</h3>
+        <div class="row">
+            {% for article in articles_historique  %}
+                <div class="card col-2 mt-2 p-1">
+                    <div class="card-body border-dark rounded p-1">
+                        <a href="/client/article/details?id_article={{ article.id_article }}" >
+                            <span style="color: #0b2e13">{{ article.nom }}</span><br>
+                            {{ article.prix }}€
+                            {%  if article.image is not none %}
+                                <img class="card-img-top rounded mx-auto d-block"  style="width:100px;height:100px"  src="{{ url_for('static', filename = 'images/')}}{{ article.image }}"  alt="image  de {{ article.nom }}" >
+                            {% else %} <img class="card-img-top rounded mx-auto d-block"   style="width:100px;height:100px"   src="{{ url_for('static', filename='images/no_photo.jpeg')}}"  alt="image  de {{ article.nom }}" >
+                            {% endif %}
+                            <hr>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-    </div>
+        <hr>
 
-    <div class="bg-light p-3">
-        <h1>Les articles</h1>
-    </div>
+        <div class="row align-self-right">
+            {% include('client/boutique/_panier.html') %}
+            <div class="col">
+                <h3>Les filtres</h3>
+                Articles dont le nom est composé par :<br>
+                {% include('client/boutique/_filtre.html') %}
+            </div>
+        </div>
 
-    <div class="row">
+        <div class="bg-light p-3">
+            <h1>Les articles</h1>
+        </div>
+        <div class="row gx-3">
             {% for article in articles  %}
-                    <div class="card col-4 mt-4 p-1">
-                        <div class="card-body border-dark rounded p-1">
-                            <a href="/client/article/details?id_article={{ article.id_article }}" >
-                            <h3 class="card-title">
-                                <span style="color: #0b2e13">{{ article.nom }}</span><br>
-                                {{ article.prix }}
-                                €
-                            </h3>
-                            <div style="height:200px">
-                                 {%  if article.image is not none %}
-                                    <img class="card-img-top rounded mx-auto d-block" style="height: 200px; width : auto;" src="{{ url_for('static', filename = 'images/')}}{{ article.image }}"  alt="image  de {{ article.nom }}" >
-                                {% else %} <img class="card-img-top rounded mx-auto d-block" style="height: 100%" src="{{ url_for('static', filename='images/no_photo.jpeg')}}"  alt="image  de {{ article.nom }}" >
-                                {% endif %}
-                                <hr>
-                            </div></a>
-                            <div class="row">
-{# #}                                {% if  article.stock is defined and article.stock != None %}
-{# #}                                    {% if article.stock > 0 %}
-                                    <form  action="/client/panier/add"  method="post" class="col-5">
-                                        <input type="hidden" name="id_article" value="{{ article.id_article }}">
-                                        <div class="input-group">
+                <div class="card col-2 mt-4 p-1O" style="margin-inline: 20px">
+                    <div class="card-body border-dark rounded p-0">
+                        {%  if article.image is not none %}
+                            <img class="card-img-top rounded mx-auto d-block" style="height: 120px; width : 180px; object-fit: contain" src="{{ url_for('static', filename = 'images/')}}{{ article.image }}"  alt="image  de {{ article.nom }}" >
+                        {% else %} <img class="card-img-top rounded mx-auto d-block" style="height: 100%" src="{{ url_for('static', filename='images/no_photo.jpeg')}}"  alt="image  de {{ article.nom }}" >
+                        {% endif %}
+                        <a href="/client/article/details?id_article={{ article.id_article }}" >
+                            <span style="color: #0b2e13;">{{ article.nom }}</span><br><span style="float: right;">{{ article.prix }}€</span><br>
+                        </a>
+                        <div>
+                            {# #}                                {% if  article.stock is defined and article.stock != None %}
+                            {# #}                                    {% if article.stock > 0 %}
+                                <form  action="/client/panier/add"  method="post">
+                                    <input type="hidden" name="id_article" value="{{ article.id_article }}">
+                                    <div class="input-group">
                                         <button class="btn  btn-success"  id="button-addon1">
-                                            <i class="fas fa-shopping-cart">Ajouter</i>
+                                            <i class="fa-solid fa-shopping-cart"></i>
                                         </button>
                                         <input type="number" id="input-{{ article.id_article }}" step="1" min="0" max="{{ article.stock }}" class="form-control" value="1" name="quantite"  aria-describedby="button-addon1">
-                                        </div>
-                                    </form>
-{# #}                                    {% endif %}
-{# #}                                {% endif %}
-                                 <div class="col-2 align-content-end">
+                                    </div>
+                                </form>
+                                {# #}                                    {% endif %}
+                            {# #}                                {% endif %}
+
                                 {% if article.liste_envie is defined %}
-                                     {%if  article.liste_envie== 1%}
-                                         <a href="/client/envie/add?id_article={{ article.id_article }}" style="text-decoration: none">💛</a>
-                                     {% else %}
-                                         <a href="/client/envie/add?id_article={{ article.id_article }}" style="text-decoration: none">🤍</a>
-                                     {% endif %}
+                                    {%if  article.liste_envie== 1%}
+                                <a href="/client/envie/add?id_article={{ article.id_article }}" style="text-decoration: none; font-size: 25px; color: mediumvioletred; display: grid; place-items: center; margin: 10px 0"><i class="fa-solid fa-heart"></i></a>
+                                    {% else %}
+                                <a href="/client/envie/add?id_article={{ article.id_article }}" style="text-decoration: none; font-size: 25px; color: sandybrown; display: grid; place-items: center; margin: 10px 0"><i class="fa-solid fa-heart-crack"></i></a>
+                                    {% endif %}
                                 {% endif %}
-                                 </div>
-                            </div>
+
                         </div>
-                        <div class="card-footer">
+                    </div>
+                    <div class="card-footer">
                         {% if article.stock is defined and article.stock != None %}
-                             {% if article.stock > 0 %}
+                            {% if article.stock > 0 %}
                                 <small class="text-muted">Stock restant : {{ article.stock }}</small>
-                             {% else %}
+                            {% else %}
                                 <small class="text-muted">article  momentanément indisponible</small>
-                             {% endif %}
+                            {% endif %}
                             {% if article.nb_declinaison is defined and article.nb_declinaison != None %}
                                 ({{ article.nb_declinaison }} d.)
                             {% endif %}
@@ -75,22 +88,22 @@
                         {% endif %}
                         {% if article.nb_notes is defined %}
                             {% if article.nb_notes > 0 %}
-                             <a  href="/client/article/details?id_article={{ article.id_article }}" >
-                                <span style="color: #3A7734"> note : {{  "{:,.1f}".format(article.moy_notes) }}({{ article.nb_notes }})</span>
-                             </a>
+                                <a  href="/client/article/details?id_article={{ article.id_article }}" >
+                                    <span style="color: #3A7734"> note : {{  "{:,.1f}".format(article.moy_notes) }}({{ article.nb_notes }})</span>
+                                </a>
                             {% endif %}
                         {% endif %}
                         {% if article.nb_avis is defined %}
                             {% if article.nb_avis > 0 %}
-                             <a href="/client/article/details?id_article={{ article.id_article }}" >
-                                <span style="color: #3A7734">({{ article.nb_avis }} avis)</span>
-                             </a>
+                                <a href="/client/article/details?id_article={{ article.id_article }}" >
+                                    <span style="color: #3A7734">({{ article.nb_avis }} avis)</span>
+                                </a>
                             {% endif %}
                         {% endif %}
-                        </div>
                     </div>
+                </div>
             {% endfor %}
+        </div>
     </div>
-</div>
-{#    {{ articles | pprint }}#}
+    {#    {{ articles | pprint }}#}
 {% endblock %}
