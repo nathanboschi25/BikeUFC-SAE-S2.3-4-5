@@ -52,23 +52,27 @@ def client_liste_envies_show():
 
 def client_historique_add(article_id, client_id):
     mycursor = get_db().cursor()
-    sql = "INSERT INTO historique VALUE (%s, %s, %s)"
-    mycursor.execute(sql, (client_id, article_id, str(datetime.datetime.now())))
-    sql = '''
-        DELETE FROM historique
-        WHERE id_utilisateur=%s 
-            and (id_utilisateur, id_velo, datetime_visite) 
-            NOT IN (
-            SELECT * FROM(
-                SELECT id_utilisateur, id_velo, datetime_visite
-                FROM historique
-                WHERE id_utilisateur = %s
-                ORDER BY datetime_visite DESC
-                LIMIT 6
-            ) as t);
-    '''
-    mycursor.execute(sql, (client_id, client_id))
-    get_db().commit()
+    sql = "SELECT * FROM historique WHERE id_utilisateur=%s AND id_velo=%s ORDER BY datetime_visite DESC LIMIT 1"
+    mycursor.execute(sql, (client_id, article_id))
+    historique = mycursor.fetchone()
+    if len(historique) == 0 :
+        sql = "INSERT INTO historique VALUE (%s, %s, NOW())"
+        mycursor.execute(sql, (client_id, article_id))
+        sql = '''
+            DELETE FROM historique
+            WHERE id_utilisateur=%s 
+                and (id_utilisateur, id_velo, datetime_visite) 
+                NOT IN (
+                SELECT * FROM(
+                    SELECT id_utilisateur, id_velo, datetime_visite
+                    FROM historique
+                    WHERE id_utilisateur = %s
+                    ORDER BY datetime_visite DESC
+                    LIMIT 6
+                ) as t);
+        '''
+        mycursor.execute(sql, (client_id, client_id))
+        get_db().commit()
 
 @client_liste_envies.route('/client/envies/up', methods=['get'])
 @client_liste_envies.route('/client/envies/down', methods=['get'])
